@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Apteki.1.0.0</string>
+    <string name="action_settings">Ustawienia</string>
+    <string name="edit_message">Adres apteki</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="button_send">Szukaj</string>
+    <string name="title_activity_display_message">Apteki 1.0.0</string>
+
+</resources>
