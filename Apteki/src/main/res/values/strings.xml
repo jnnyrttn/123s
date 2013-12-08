@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Apteki.1.0.0Project</string>
+    <string name="edit_message">Edytuj</string>
+    <string name="button_send">Wyslij</string>
+    <string name="action_settings">Settings</string>
+
+</resources>
