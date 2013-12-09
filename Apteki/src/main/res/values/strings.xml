@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name">Apteki.1.0.0Project</string>
-    <string name="edit_message">Edytuj</string>
-    <string name="button_send">Wyslij</string>
+    <string name="street_name">Podaj ulicę</string>
+    <string name="button_search">Szukaj</string>
     <string name="action_settings">Settings</string>
 
 </resources>

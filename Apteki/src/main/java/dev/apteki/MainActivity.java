@@ -2,6 +2,8 @@ package dev.apteki;
 
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,8 +12,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+import android.util.Log;
+import android.widget.EditText;
+
+
 
 public class MainActivity extends ActionBarActivity {
+
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +31,11 @@ public class MainActivity extends ActionBarActivity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+        /*
+        SupportMapFragment fragMap = ((SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map));
+        mMap = fragMap.getMap();
+        */
     }
 
 
@@ -61,9 +74,9 @@ public class MainActivity extends ActionBarActivity {
             return rootView;
         }
     }
-
-    public void sendMessage(View view) {
-
+    public void searchStreet(View view) {
+        EditText editField =  (EditText)findViewById(R.id.street_name);
+        String street = editField.getText().toString();
+        Log.d("Search",street);
     }
-
 }
