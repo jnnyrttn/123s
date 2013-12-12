@@ -1,25 +1,25 @@
 package dev.apteki;
 
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
+import android.app.Activity;
+import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.model.*;
 import android.support.v4.app.Fragment;
+
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
+
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
-import android.util.Log;
 import android.widget.EditText;
+import dev.apteki.webservice.WebserviceActivity;
+import android.os.AsyncTask;
 
 
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends ActionBarActivity {
-
-    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,33 +30,12 @@ public class MainActivity extends ActionBarActivity {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
+
         }
-        /*
-        SupportMapFragment fragMap = ((SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map));
-        mMap = fragMap.getMap();
-        */
-    }
 
+        //GoogleMap map = ((MapFragment) getFragmentManager()
+        //        .findFragmentById(R.id.map)).getMap();
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -69,14 +48,20 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+                                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             return rootView;
         }
     }
-    public void searchStreet(View view) {
+    /*
+        Called when user click on search button. Ivokes dev.apteki.webservice methods
+     */
+
+    public void searchStreet(View view) throws ExecutionException, InterruptedException {
         EditText editField =  (EditText)findViewById(R.id.street_name);
         String street = editField.getText().toString();
-        Log.d("Search",street);
+
+        String url = "http://stroner.ayz.pl/apteki/?json=";
+        AsyncTask asyncTask = new WebserviceActivity(this).execute(url,street);
     }
 }
