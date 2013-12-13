@@ -1,28 +1,26 @@
-package dev.apteki.webservice;
+package dev.apteki;
 
-import android.app.ProgressDialog;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
+import android.util.Log;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import android.util.Log;
-
 
 public class WebserviceActivity extends AsyncTask<String, Void, String>{
 
-
-
     private Activity mActivity;
     private ProgressDialog dialog;
+    private AsyncTaskListener callback;
 
     /*
      *  Web service constructor
@@ -31,6 +29,7 @@ public class WebserviceActivity extends AsyncTask<String, Void, String>{
     public WebserviceActivity(Activity activity)
     {
         this.mActivity = activity;
+        this.callback = (AsyncTaskListener)activity;
     }
 
     /*
@@ -60,7 +59,10 @@ public class WebserviceActivity extends AsyncTask<String, Void, String>{
     public void onPostExecute(String result) {
         super.onPostExecute(result);
         this.dialog.dismiss();
-        Log.d("Async", result);
+        callback.onTaskComplete(result);
+
+        //jsonParsed.setText(result);
+
     }
 
     private static String convertInputStreamToString(InputStream inputStream) throws IOException{

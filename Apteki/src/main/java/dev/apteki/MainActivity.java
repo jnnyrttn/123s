@@ -9,17 +9,22 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.text.Html;
 
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import dev.apteki.webservice.WebserviceActivity;
 import android.os.AsyncTask;
 
-
+import android.widget.TextView;
 import java.util.concurrent.ExecutionException;
+import org.json.JSONObject;
+import org.json.JSONException;
+import org.json.JSONArray;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements AsyncTaskListener{
+
+    public TextView jsonParsed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,9 +37,30 @@ public class MainActivity extends ActionBarActivity {
                     .commit();
 
         }
-
         //GoogleMap map = ((MapFragment) getFragmentManager()
         //        .findFragmentById(R.id.map)).getMap();
+
+    }
+
+    @Override
+    public void onTaskComplete(String result) {
+        this.jsonParsed = (TextView) findViewById(R.id.json);
+        try{
+            JSONObject jObject = new JSONObject(result);
+            JSONArray phrams = null;
+            phrams = jObject.getJSONArray("apteki");
+            this.jsonParsed.setText("\n");
+            for(int i = 0; i < phrams.length(); i++){
+                JSONObject c = phrams.getJSONObject(i);
+                String name = c.getString("name");
+                String street = c.getString("street");
+                this.jsonParsed.append(Html.fromHtml("<h3>"+ name + "</h3>" + "<p>" + street + "</p>"));
+            }
+
+            Log.d("Async", result);
+        } catch (JSONException e) {
+                // Oops
+        }
 
     }
 
@@ -64,4 +90,5 @@ public class MainActivity extends ActionBarActivity {
         String url = "http://stroner.ayz.pl/apteki/?json=";
         AsyncTask asyncTask = new WebserviceActivity(this).execute(url,street);
     }
+
 }
