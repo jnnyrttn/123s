@@ -36,14 +36,17 @@ public class MainActivity extends ActionBarActivity implements AsyncTaskListener
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
 
+
         }
-        //GoogleMap map = ((MapFragment) getFragmentManager()
-        //        .findFragmentById(R.id.map)).getMap();
 
     }
 
     @Override
     public void onTaskComplete(String result) {
+
+        GoogleMap map = ((MapFragment) getFragmentManager()
+                .findFragmentById(R.id.map)).getMap();
+
         this.jsonParsed = (TextView) findViewById(R.id.json);
         try{
             JSONObject jObject = new JSONObject(result);
@@ -53,8 +56,15 @@ public class MainActivity extends ActionBarActivity implements AsyncTaskListener
             for(int i = 0; i < phrams.length(); i++){
                 JSONObject c = phrams.getJSONObject(i);
                 String name = c.getString("name");
-                String street = c.getString("street");
-                this.jsonParsed.append(Html.fromHtml("<h3>"+ name + "</h3>" + "<p>" + street + "</p>"));
+                String desc = c.getString("street");
+                double  latitude = c.getDouble("lat");
+                double  longtitude = c.getDouble("long");
+
+                LatLng local = new LatLng(latitude, longtitude);
+                map.addMarker(new MarkerOptions()
+                        .title(name)
+                        .snippet(desc)
+                        .position(local));
             }
 
             Log.d("Async", result);
