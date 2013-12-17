@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.text.Html;
+import android.view.inputmethod.InputMethodManager;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +47,7 @@ public class MainActivity extends ActionBarActivity implements AsyncTaskListener
 
         GoogleMap map = ((MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map)).getMap();
+        map.clear();
 
         this.jsonParsed = (TextView) findViewById(R.id.json);
         try{
@@ -97,8 +99,19 @@ public class MainActivity extends ActionBarActivity implements AsyncTaskListener
         EditText editField =  (EditText)findViewById(R.id.street_name);
         String street = editField.getText().toString();
 
+        InputMethodManager inputManager = (InputMethodManager)
+                getSystemService(this.INPUT_METHOD_SERVICE);
+
+        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
+
         String url = "http://stroner.ayz.pl/apteki/?json=";
-        AsyncTask asyncTask = new WebserviceActivity(this).execute(url,street);
+        //String url = "http://stroner.ayz.pl/apteki/?json=1";
+        //String url = "https://api.mongolab.com/api/1/databases/put_apteki/collections/apteki?apiKey=x1p9JkpjwKJu6Tk_NPmgvW6m-_Xr9C7m";
+        //String url = "https://api.mongolab.com/api/1/databases/put_apteki/collections/apteki/runCommand?apiKey=x1p9JkpjwKJu6Tk_NPmgvW6m-_Xr9C7m";
+        //String url = "https://api.mongolab.com/api/1/databases/put_apteki/collections/apteki/?q={apteki.name : /"+street+"/}&apiKey=x1p9JkpjwKJu6Tk_NPmgvW6m-_Xr9C7m";
+
+        AsyncTask asyncTask = new WebserviceActivity(this).execute(url,street,"","");
     }
 
 }
