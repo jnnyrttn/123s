@@ -4,6 +4,7 @@
     <string name="app_name">Apteki.1.0.0Project</string>
     <string name="street_name">Podaj ulicę</string>
     <string name="button_search">Szukaj</string>
+    <string name="button_search_near">W pobliżu</string>
     <string name="action_settings">Settings</string>
 
 </resources>

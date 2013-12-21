@@ -14,6 +14,9 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.ClientProtocolException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,7 +30,7 @@ import com.mongodb.util.*;
 import com.mongodb.MongoClientURI;
 
 
-public class WebserviceActivity extends AsyncTask<String, Void, String>{
+public class WebserviceActivity extends AsyncTask<String, Void, JSONArray>{
 
     private Activity mActivity;
     private ProgressDialog dialog;
@@ -49,16 +52,21 @@ public class WebserviceActivity extends AsyncTask<String, Void, String>{
      *   @return null
      */
     @Override
-    protected String doInBackground(String... urls)
+    protected JSONArray doInBackground(String... urls)
     {
 
         String qstring = urls[1];
-        String result = "";
-        if(!qstring.isEmpty()){
-            String serverURL = urls[0]+qstring;
-            //result = this.GET(serverURL,"","","");
+        String lat = urls[2];
+        String lng = urls[3];
+        JSONArray result = new JSONArray();
+
+        if(!qstring.isEmpty() || ( !lat.isEmpty() && !lng.isEmpty()) ){
             try{
-                result = this.MongoSearch(qstring);
+                if(!lat.isEmpty() && !lng.isEmpty()){
+                    String[] loc = {lat,lng};
+                    result = this.MongoSearch(qstring,urls[0],loc);
+                }
+                else result = this.MongoSearch(qstring,urls[0]);
             } catch (UnknownHostException e){
 
             }
@@ -72,13 +80,10 @@ public class WebserviceActivity extends AsyncTask<String, Void, String>{
     }
 
     @Override
-    public void onPostExecute(String result) {
+    public void onPostExecute(JSONArray result) {
         super.onPostExecute(result);
         this.dialog.dismiss();
         callback.onTaskComplete(result);
-
-        //jsonParsed.setText(result);
-
     }
 
     private static String convertInputStreamToString(InputStream inputStream) throws IOException{
@@ -97,16 +102,10 @@ public class WebserviceActivity extends AsyncTask<String, Void, String>{
         String result = "";
         try {
 
-            // create HttpClient
             HttpClient httpclient = new DefaultHttpClient();
-
-            // make GET request to the given URL
             HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
-
-            // receive response as inputStream
             inputStream = httpResponse.getEntity().getContent();
 
-            // convert inputstream to string
             if(inputStream != null)
                 result = convertInputStreamToString(inputStream);
             else
@@ -117,63 +116,56 @@ public class WebserviceActivity extends AsyncTask<String, Void, String>{
         }
         return result;
     }
-    public static String POST(String url, String address, String latitude, String longtitude) {
 
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(url);
-        InputStream inputStream = null;
+    public static JSONArray MongoSearch(String street, String mongoUri, String... loc ) throws UnknownHostException{
         String result = "";
 
-        try {
-            // Add your data
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            //nameValuePairs.add(new BasicNameValuePair("json", "1"));
-            //nameValuePairs.add(new BasicNameValuePair("lat", latitude));
-            //nameValuePairs.add(new BasicNameValuePair("long", longtitude));
-            //nameValuePairs.add(new BasicNameValuePair("address", address));
-
-            nameValuePairs.add(new BasicNameValuePair("query", "{}"));
-            httppost.setHeader("Content-Type",
-                    "application/json;charset=utf-8");
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs,"UTF-8"));
-
-            // Execute HTTP Post Request
-            HttpResponse response = httpclient.execute(httppost);
-            inputStream = response.getEntity().getContent();
-
-            // convert inputstream to string
-            if(inputStream != null)
-                result = convertInputStreamToString(inputStream);
-            else
-                result = "Error occured!";
-
-        } catch (ClientProtocolException e) {
-
-        } catch (IOException e) {
-
-        } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
-        }
-        Log.d("Async",result);
-        return result;
-    }
-    public static String MongoSearch(String street) throws UnknownHostException{
-        String result = "";
-        String mongoUri = "mongodb://put_aptuser:fgkgw23x8@ds061248.mongolab.com:61248/put_apteki";
         MongoClientURI uri  = new MongoClientURI(mongoUri);
         MongoClient client = new MongoClient(uri);
         DB db = client.getDB(uri.getDatabase());
 
         DBCollection apteki = db.getCollection("apteki");
-        BasicDBObject findQuery = new BasicDBObject("street", new BasicDBObject("$eq","Naramowicka"));
+        DBObject query;
 
-        DBCursor docs = apteki.find(findQuery);
-        Log.d("Async","Foo");
-        while(docs.hasNext()){
-            DBObject doc = docs.next();
-            Log.d("Async", " " + doc.get("name") + " ");
+        if(loc.length > 1) {
+            String lat = loc[0];
+            String lon = loc[1];
+            query = (DBObject) JSON.parse("{'loc': {'$near':["+ lat + "," + lon + "]}}");
+            //Log.d("Async","{loc: {$near:["+ lat + ","+ lon +"]}}" );
+        } else {
+            query = (DBObject) JSON.parse("{'adress':{'$regex':'" + street + "','$options':'i'}}");
         }
 
-        return result;
+        DBCursor pharmResults = apteki.find(query).limit(6);
+        JSONArray returnArray = new JSONArray();
+
+        if(pharmResults.count() == 0){
+            Log.d("Async","No results found !");
+        }
+
+
+        while(pharmResults.hasNext()){
+            DBObject apteka = pharmResults.next();
+            JSONObject returnObject = new JSONObject();
+            Object location = null;
+            DBObject latlng = null;
+            try{
+                returnObject.put("name",apteka.get("name"));
+                returnObject.put("adress",apteka.get("adress"));
+                location = apteka.get("loc");
+                latlng = (DBObject) JSON.parse(location.toString());
+                returnObject.put("lat",latlng.get("lat"));
+                returnObject.put("lon",latlng.get("lon"));
+
+            } catch(JSONException e){
+
+            }
+            returnArray.put(returnObject);
+            //Log.d("Async","Results count :" + pharmResults.count());
+            Log.d("Async"," name: " + apteka.get("name") + " address : " + apteka.get("adress") + " lat : " + latlng.get("lat") + " lon : " + latlng.get("lon"));
+            //System.out.println(location);
+        }
+        //return result;
+        return returnArray;
     }
 }

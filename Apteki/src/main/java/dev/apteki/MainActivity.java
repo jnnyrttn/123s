@@ -43,24 +43,24 @@ public class MainActivity extends ActionBarActivity implements AsyncTaskListener
     }
 
     @Override
-    public void onTaskComplete(String result) {
+    public void onTaskComplete(JSONArray result) {
 
         GoogleMap map = ((MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map)).getMap();
         map.clear();
-
-        this.jsonParsed = (TextView) findViewById(R.id.json);
         try{
-            JSONObject jObject = new JSONObject(result);
-            JSONArray phrams = null;
-            phrams = jObject.getJSONArray("apteki");
-            this.jsonParsed.setText("\n");
+            //JSONObject jObject = new JSONObject(result);
+            //JSONArray phrams = null;
+            //phrams = jObject.getJSONArray("apteki");
+            JSONArray phrams = result;
+
             for(int i = 0; i < phrams.length(); i++){
                 JSONObject c = phrams.getJSONObject(i);
                 String name = c.getString("name");
-                String desc = c.getString("street");
+                String desc = c.getString("adress");
+
                 double  latitude = c.getDouble("lat");
-                double  longtitude = c.getDouble("long");
+                double  longtitude = c.getDouble("lon");
 
                 LatLng local = new LatLng(latitude, longtitude);
                 map.addMarker(new MarkerOptions()
@@ -69,7 +69,6 @@ public class MainActivity extends ActionBarActivity implements AsyncTaskListener
                         .position(local));
             }
 
-            Log.d("Async", result);
         } catch (JSONException e) {
                 // Oops
         }
@@ -105,13 +104,20 @@ public class MainActivity extends ActionBarActivity implements AsyncTaskListener
         inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);
 
-        String url = "http://stroner.ayz.pl/apteki/?json=";
+        //String mongoUri = "mongodb://put_aptuser:fgkgw23x8@ds061248.mongolab.com:61248/put_apteki";
+        String url = "mongodb://guest:1234@192.168.2.31/apteki";
         //String url = "http://stroner.ayz.pl/apteki/?json=1";
-        //String url = "https://api.mongolab.com/api/1/databases/put_apteki/collections/apteki?apiKey=x1p9JkpjwKJu6Tk_NPmgvW6m-_Xr9C7m";
-        //String url = "https://api.mongolab.com/api/1/databases/put_apteki/collections/apteki/runCommand?apiKey=x1p9JkpjwKJu6Tk_NPmgvW6m-_Xr9C7m";
-        //String url = "https://api.mongolab.com/api/1/databases/put_apteki/collections/apteki/?q={apteki.name : /"+street+"/}&apiKey=x1p9JkpjwKJu6Tk_NPmgvW6m-_Xr9C7m";
-
         AsyncTask asyncTask = new WebserviceActivity(this).execute(url,street,"","");
     }
 
+    public void searchStreetNear(View view) throws ExecutionException, InterruptedException {
+        //String mongoUri = "mongodb://put_aptuser:fgkgw23x8@ds061248.mongolab.com:61248/put_apteki";
+        String url = "mongodb://guest:1234@192.168.2.31/apteki";
+
+        InputMethodManager inputManager = (InputMethodManager)
+                getSystemService(this.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
+        AsyncTask asyncTask = new WebserviceActivity(this).execute(url,"","16.5191403","52.3574853");
+    }
 }
