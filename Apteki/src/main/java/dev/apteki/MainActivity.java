@@ -1,5 +1,6 @@
 package dev.apteki;
 
+import android.location.LocationManager;
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
 import com.google.android.gms.maps.*;
@@ -23,7 +24,9 @@ import org.json.JSONObject;
 import org.json.JSONException;
 import org.json.JSONArray;
 
-public class MainActivity extends ActionBarActivity implements AsyncTaskListener{
+import android.location.Location;
+
+public class MainActivity extends ActionBarActivity implements AsyncTaskListener, LocationTaskListener{
 
     public TextView jsonParsed;
 
@@ -36,8 +39,6 @@ public class MainActivity extends ActionBarActivity implements AsyncTaskListener
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
-
-
         }
 
     }
@@ -49,9 +50,6 @@ public class MainActivity extends ActionBarActivity implements AsyncTaskListener
                 .findFragmentById(R.id.map)).getMap();
         map.clear();
         try{
-            //JSONObject jObject = new JSONObject(result);
-            //JSONArray phrams = null;
-            //phrams = jObject.getJSONArray("apteki");
             JSONArray phrams = result;
 
             for(int i = 0; i < phrams.length(); i++){
@@ -73,6 +71,10 @@ public class MainActivity extends ActionBarActivity implements AsyncTaskListener
                 // Oops
         }
 
+    }
+
+    public void onLocationComplete(Location location){
+        Log.d("Async","getting location");
     }
 
     /**
@@ -104,20 +106,21 @@ public class MainActivity extends ActionBarActivity implements AsyncTaskListener
         inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);
 
-        //String mongoUri = "mongodb://put_aptuser:fgkgw23x8@ds061248.mongolab.com:61248/put_apteki";
-        String url = "mongodb://guest:1234@192.168.2.31/apteki";
+        String url = "mongodb://guest:1234@ds061248.mongolab.com:61248/put_apteki";
+        //String url = "mongodb://guest:1234@192.168.2.31/apteki";
         //String url = "http://stroner.ayz.pl/apteki/?json=1";
         AsyncTask asyncTask = new WebserviceActivity(this).execute(url,street,"","");
     }
 
     public void searchStreetNear(View view) throws ExecutionException, InterruptedException {
-        //String mongoUri = "mongodb://put_aptuser:fgkgw23x8@ds061248.mongolab.com:61248/put_apteki";
-        String url = "mongodb://guest:1234@192.168.2.31/apteki";
+        String url = "mongodb://guest:1234@ds061248.mongolab.com:61248/put_apteki";
+        //String url = "mongodb://guest:1234@192.168.2.31/apteki";
 
         InputMethodManager inputManager = (InputMethodManager)
                 getSystemService(this.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);
-        AsyncTask asyncTask = new WebserviceActivity(this).execute(url,"","16.5191403","52.3574853");
+        new LocationActivity(this).getLocation();
+        //AsyncTask asyncTask = new WebserviceActivity(this).execute(url,"","16.5191403","52.3574853");
     }
 }
