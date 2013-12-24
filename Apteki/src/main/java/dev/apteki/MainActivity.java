@@ -29,7 +29,8 @@ import android.location.Location;
 public class MainActivity extends ActionBarActivity implements AsyncTaskListener, LocationTaskListener{
 
     public TextView jsonParsed;
-
+    public String lat;
+    public String lng;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,7 +75,12 @@ public class MainActivity extends ActionBarActivity implements AsyncTaskListener
     }
 
     public void onLocationComplete(Location location){
-        Log.d("Async","getting location");
+        lat = String.valueOf(location.getLatitude());
+        lng = String.valueOf(location.getLongitude());
+        Log.d("Async","Latitude:" + lat + ", Longitude:" + lng);
+        String url = "mongodb://guest:1234@ds061248.mongolab.com:61248/put_apteki";
+        //String url = "mongodb://guest:1234@192.168.2.31/apteki";
+        AsyncTask asyncTask = new WebserviceActivity(this).execute(url,"",lat, lng);
     }
 
     /**
@@ -113,14 +119,11 @@ public class MainActivity extends ActionBarActivity implements AsyncTaskListener
     }
 
     public void searchStreetNear(View view) throws ExecutionException, InterruptedException {
-        String url = "mongodb://guest:1234@ds061248.mongolab.com:61248/put_apteki";
-        //String url = "mongodb://guest:1234@192.168.2.31/apteki";
 
         InputMethodManager inputManager = (InputMethodManager)
                 getSystemService(this.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);
         new LocationActivity(this).getLocation();
-        //AsyncTask asyncTask = new WebserviceActivity(this).execute(url,"","16.5191403","52.3574853");
     }
 }

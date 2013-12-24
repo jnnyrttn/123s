@@ -15,30 +15,26 @@ public class LocationActivity  implements LocationListener{
     protected LocationManager locationManager;
     protected LocationListener locationListener;
     protected Location location;
-    TextView txtLat;
-    String lat;
-    String provider;
+
     protected String latitude,longitude;
-    protected boolean gps_enabled,network_enabled;
+
     private LocationTaskListener callback;
     private Activity mActivity;
-    private ProgressDialog dialog;
 
     public LocationActivity(Activity activity){
         //locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         //Log.d("Async","Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude() +"");
         this.mActivity = activity;
-        this.callback = null;
+        this.callback = (LocationTaskListener) activity;
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        double lat = location.getLatitude();
-        double lng = location.getLongitude();
-        callback.onLocationComplete(location);
+
+        callback.onLocationComplete( location );
         locationManager.removeUpdates(this);
-        //Log.d("Async","Latitude:" + lat + ", Longitude:" + lng +"");
+
     }
 
     @Override
@@ -48,17 +44,17 @@ public class LocationActivity  implements LocationListener{
 
     @Override
     public void onProviderEnabled(String provider) {
-        Log.d("Async","enable");
+        Log.d("Async","onProviderEnabled");
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.d("Async","status");
+        Log.d("Async","onStatusChanged");
     }
     public void getLocation() {
         Log.d("Async","getting location...");
-        locationManager = (LocationManager) this.mActivity.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-
+        locationManager = (LocationManager) ( (Activity) this.mActivity ).getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         /*
         if(!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) )
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,

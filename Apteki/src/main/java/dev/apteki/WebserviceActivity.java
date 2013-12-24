@@ -162,7 +162,7 @@ public class WebserviceActivity extends AsyncTask<String, Void, JSONArray>{
             }
             returnArray.put(returnObject);
             //Log.d("Async","Results count :" + pharmResults.count());
-            Log.d("Async"," name: " + apteka.get("name") + " address : " + apteka.get("adress") + " lat : " + latlng.get("lat") + " lon : " + latlng.get("lon"));
+            //Log.d("Async"," name: " + apteka.get("name") + " address : " + apteka.get("adress") + " lat : " + latlng.get("lat") + " lon : " + latlng.get("lon"));
             //System.out.println(location);
         }
         //return result;
