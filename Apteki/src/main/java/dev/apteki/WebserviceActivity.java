@@ -34,6 +34,7 @@ public class WebserviceActivity extends AsyncTask<String, Void, JSONArray>{
 
     private Activity mActivity;
     private ProgressDialog dialog;
+
     private AsyncTaskListener callback;
 
     /*
@@ -58,25 +59,37 @@ public class WebserviceActivity extends AsyncTask<String, Void, JSONArray>{
         String qstring = urls[1];
         String lat = urls[2];
         String lng = urls[3];
-        JSONArray result = new JSONArray();
+        String resCount = urls[4];
 
+        JSONArray result = new JSONArray();
+        /*
         if(!qstring.isEmpty() || ( !lat.isEmpty() && !lng.isEmpty()) ){
             try{
                 if(!lat.isEmpty() && !lng.isEmpty()){
                     String[] loc = {lat,lng};
-                    result = this.MongoSearch(qstring,urls[0],loc);
+                    result = this.MongoSearch(qstring,urls[0],resCount,loc);
                 }
-                else result = this.MongoSearch(qstring,urls[0]);
+                else result = this.MongoSearch(qstring,urls[0],resCount,"");
             } catch (UnknownHostException e){
 
             }
+        }
+        */
+        try{
+            if(!lat.isEmpty() && !lng.isEmpty()){
+                String[] loc = {lat,lng};
+                result = this.MongoSearch(qstring,urls[0],resCount,loc);
+            }
+            else result = this.MongoSearch(qstring,urls[0],resCount,"");
+        } catch (UnknownHostException e){
+
         }
         return result;
     }
     @Override
     protected void onPreExecute()
     {
-        this.dialog = ProgressDialog.show(this.mActivity, "", "Loading...");
+        this.dialog = ProgressDialog.show(this.mActivity, "", "Wyszukuję...");
     }
 
     @Override
@@ -97,27 +110,14 @@ public class WebserviceActivity extends AsyncTask<String, Void, JSONArray>{
         return result;
     }
 
-    public static String GET(String url, String address, String latitude, String longtitude){
-        InputStream inputStream = null;
-        String result = "";
-        try {
+    /*
+        Query mongo service for objects containing street string in their address or description.
+        @param String street
+        @param String mongoUri
+        @param String[] loc Latitude and longtitude.
+     */
 
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
-            inputStream = httpResponse.getEntity().getContent();
-
-            if(inputStream != null)
-                result = convertInputStreamToString(inputStream);
-            else
-                result = "Error occured!";
-
-        } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
-        }
-        return result;
-    }
-
-    public static JSONArray MongoSearch(String street, String mongoUri, String... loc ) throws UnknownHostException{
+    public static JSONArray MongoSearch(String street, String mongoUri,String resCount, String... loc ) throws UnknownHostException{
         String result = "";
 
         MongoClientURI uri  = new MongoClientURI(mongoUri);
@@ -128,20 +128,16 @@ public class WebserviceActivity extends AsyncTask<String, Void, JSONArray>{
         DBObject query;
 
         if(loc.length > 1) {
-            String lat = loc[0];
-            String lon = loc[1];
+            String lat = loc[1];
+            String lon = loc[0];
+            if(street.isEmpty())
             query = (DBObject) JSON.parse("{'loc': {'$near':["+ lat + "," + lon + "]}}");
-            //Log.d("Async","{loc: {$near:["+ lat + ","+ lon +"]}}" );
+            else query = (DBObject) JSON.parse("{'adress':{'$regex':'" + street + "','$options':'i'},'loc': {'$near':["+ lat + "," + lon + "]}}");
         } else {
             query = (DBObject) JSON.parse("{'adress':{'$regex':'" + street + "','$options':'i'}}");
         }
-
-        DBCursor pharmResults = apteki.find(query).limit(6);
+        DBCursor pharmResults = apteki.find(query).limit(Integer.decode(resCount));
         JSONArray returnArray = new JSONArray();
-
-        if(pharmResults.count() == 0){
-            Log.d("Async","No results found !");
-        }
 
 
         while(pharmResults.hasNext()){
@@ -161,11 +157,7 @@ public class WebserviceActivity extends AsyncTask<String, Void, JSONArray>{
 
             }
             returnArray.put(returnObject);
-            //Log.d("Async","Results count :" + pharmResults.count());
-            //Log.d("Async"," name: " + apteka.get("name") + " address : " + apteka.get("adress") + " lat : " + latlng.get("lat") + " lon : " + latlng.get("lon"));
-            //System.out.println(location);
         }
-        //return result;
         return returnArray;
     }
 }

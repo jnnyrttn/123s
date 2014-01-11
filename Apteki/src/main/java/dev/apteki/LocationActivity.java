@@ -22,9 +22,6 @@ public class LocationActivity  implements LocationListener{
     private Activity mActivity;
 
     public LocationActivity(Activity activity){
-        //locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        //Log.d("Async","Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude() +"");
         this.mActivity = activity;
         this.callback = (LocationTaskListener) activity;
     }
@@ -55,13 +52,13 @@ public class LocationActivity  implements LocationListener{
         Log.d("Async","getting location...");
         locationManager = (LocationManager) ( (Activity) this.mActivity ).getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        /*
+
+
         if(!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) )
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
                     0, this);
         else
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0,
                     0, this);
-        */
     }
 }
