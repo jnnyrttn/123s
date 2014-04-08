@@ -62,19 +62,6 @@ public class WebserviceActivity extends AsyncTask<String, Void, JSONArray>{
         String resCount = urls[4];
 
         JSONArray result = new JSONArray();
-        /*
-        if(!qstring.isEmpty() || ( !lat.isEmpty() && !lng.isEmpty()) ){
-            try{
-                if(!lat.isEmpty() && !lng.isEmpty()){
-                    String[] loc = {lat,lng};
-                    result = this.MongoSearch(qstring,urls[0],resCount,loc);
-                }
-                else result = this.MongoSearch(qstring,urls[0],resCount,"");
-            } catch (UnknownHostException e){
-
-            }
-        }
-        */
         try{
             if(!lat.isEmpty() && !lng.isEmpty()){
                 String[] loc = {lat,lng};

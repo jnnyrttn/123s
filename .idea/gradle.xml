@@ -4,7 +4,13 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
-        <option name="externalProjectPath" value="C:\Users\pawel\AndroidStudioProjects\Apteki.1.0.0Project" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/Apteki" />
+          </set>
+        </option>
       </GradleProjectSettings>
     </option>
   </component>

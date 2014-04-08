@@ -108,15 +108,8 @@ public class MainActivity extends ActionBarActivity implements AsyncTaskListener
                 int padding = 80;
                 CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                 map.moveCamera(cu);
-                /*
-                CameraPosition cp = new CameraPosition.Builder().target(position)
-                        .zoom(10).build();
-
-                map.moveCamera(CameraUpdateFactory.newCameraPosition(cp));
-                */
             }
         } catch (JSONException e) {
-                // Oops
         }
 
     }
